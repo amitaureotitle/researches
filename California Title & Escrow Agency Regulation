@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA Title & Escrow Regulatory Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fdfbf7; color: #1f2937; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 300px; max-height: 400px; }
+        .active-tab { border-bottom: 2px solid #b45309; color: #b45309; font-weight: 600; }
+        .inactive-tab { color: #6b7280; }
+        .timeline-line { position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background-color: #e5e7eb; z-index: 0; }
+        .step-active .timeline-dot { background-color: #b45309; border-color: #fff9c4; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        /* Custom scrollbar for timeline if needed */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
+    <!-- Chosen Palette: Warm Professional - Background #fdfbf7 (Cream), Primary #b45309 (Amber/Bronze), Secondary #1f2937 (Dark Slate), Accent #fff9c4 (Pale Yellow) -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Sets the context.
+         2. The Great Divide: Interactive toggle comparing Title (CDI) vs. Escrow (DFPI). This is the foundational knowledge required.
+         3. Interactive Timeline: A detailed breakdown of the 1-2 year process, split by stages with data visualizations of time allocation.
+         4. Financial Requirements: A specialized calculator to explain the Surety Bond vs. Liquid Capital confusion.
+         5. Standards of Practice: A comparison grid of "Legal Requirement" vs. "Industry Reality".
+    -->
+    <!-- Visualization & Content Choices:
+         - Time Allocation: Chart.js Doughnut chart to visualize the "Waiting Game" vs. "Active Work".
+         - Financial Comparison: Chart.js Bar chart comparing startup costs between models.
+         - Bond Calculator: Custom JS logic to calculate premiums vs. face value.
+         - Timeline: Vertical interactive list (HTML/JS) updating a detail view.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-[#fdfbf7] text-slate-800">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">⚖️</span>
+                <h1 class="text-xl font-bold text-slate-900 tracking-tight">CA Title & Escrow Roadmap</h1>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="#the-split" class="hover:text-amber-700 transition-colors">The Regulatory Split</a>
+                <a href="#timeline" class="hover:text-amber-700 transition-colors">Time Estimates</a>
+                <a href="#financials" class="hover:text-amber-700 transition-colors">Bonds vs. Cash</a>
+                <a href="#reality" class="hover:text-amber-700 transition-colors">Reality Check</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- Intro -->
+        <section class="text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">Navigating the California Landscape</h2>
+            <p class="text-lg text-slate-600 leading-relaxed">
+                Starting a closing service in California involves navigating two distinct regulatory paths. 
+                Whether you choose to be an <strong>Independent Escrow</strong> or an <strong>Underwritten Title Company</strong> determines your regulator, capital requirements, and timeline.
+                Use this dashboard to explore the requirements, costs, and unwritten rules of the trade.
+            </p>
+        </section>
+
+        <!-- SECTION 1: THE GREAT DIVIDE -->
+        <section id="the-split" class="bg-white rounded-xl card-shadow overflow-hidden border border-stone-100">
+            <div class="bg-slate-900 text-white p-6">
+                <h3 class="text-xl font-bold flex items-center">
+                    <span class="mr-2">⚡</span> The Great Divide: Title vs. Escrow
+                </h3>
+                <p class="text-slate-300 mt-2 text-sm">
+                    In California, you are generally one or the other. Understanding this jurisdiction split is the first legal requirement.
+                </p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Toggle Controls -->
+                <div class="flex justify-center mb-8">
+                    <div class="bg-stone-100 p-1 rounded-lg inline-flex">
+                        <button onclick="switchRegulatoryView('escrow')" id="btn-escrow" class="px-6 py-2 rounded-md text-sm font-medium transition-all shadow-sm bg-white text-slate-900">Independent Escrow</button>
+                        <button onclick="switchRegulatoryView('title')" id="btn-title" class="px-6 py-2 rounded-md text-sm font-medium transition-all text-slate-500 hover:text-slate-900">Title Company</button>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    <!-- Text Info -->
+                    <div id="reg-info-panel" class="space-y-6">
+                        <div class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-amber-900 mb-1" id="reg-authority">Regulator: DFPI</h4>
+                            <p class="text-sm text-amber-800" id="reg-desc">Department of Financial Protection & Innovation</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-slate-900 mb-2">Core Definition</h4>
+                            <p class="text-slate-600 text-sm leading-relaxed" id="reg-definition">
+                                A neutral third party that holds funds and documents. Licensed under the CA Financial Code. Cannot issue title insurance policies. Commonly known as "Independent Escrow".
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-slate-900 mb-2">Key Restrictions</h4>
+                            <ul class="text-sm text-slate-600 space-y-2 list-disc pl-5" id="reg-restrictions">
+                                <li>Must be a standalone corporation (C-Corp).</li>
+                                <li>Sole purpose: Escrow business only.</li>
+                                <li>Must have a qualified manager on-site with 5+ years experience.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Visual Comp -->
+                    <div class="bg-stone-50 rounded-lg p-6 flex flex-col items-center justify-center border border-stone-200">
+                        <h4 class="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Market Share & Difficulty</h4>
+                        <div class="chart-container">
+                            <canvas id="marketShareChart"></canvas>
+                        </div>
+                        <p class="text-xs text-center text-slate-400 mt-4">Relative barrier to entry complexity</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: TIMELINE ESTIMATES -->
+        <section id="timeline">
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-slate-900">The 1-2 Year Journey</h3>
+                <p class="text-slate-600 mt-2 max-w-3xl">
+                    Why does it take so long? The "Time Splits" below reveal that while your active work takes 3-4 months, the state vetting process creates the bulk of the 12-18 month timeline.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Timeline Navigation -->
+                <div class="lg:col-span-1 bg-white rounded-xl card-shadow p-6 border border-stone-100 h-fit">
+                    <h4 class="font-bold text-slate-800 mb-4 border-b pb-2">Phase Breakdown</h4>
+                    <div class="relative pl-6 space-y-8" id="timeline-nav">
+                        <div class="timeline-line"></div>
+                        
+                        <!-- Step 1 -->
+                        <div class="relative cursor-pointer group step-active" onclick="updateTimeline(0)">
+                            <div class="timeline-dot absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 bg-amber-600 border-amber-100 transition-colors"></div>
+                            <h5 class="font-semibold text-slate-900 group-hover:text-amber-600 transition-colors">1. Preparation & Formation</h5>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Months 1-3</span>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="relative cursor-pointer group" onclick="updateTimeline(1)">
+                            <div class="timeline-dot absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 bg-white border-slate-300 group-hover:border-amber-400 transition-colors"></div>
+                            <h5 class="font-semibold text-slate-600 group-hover:text-amber-600 transition-colors">2. The Application</h5>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Month 4</span>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="relative cursor-pointer group" onclick="updateTimeline(2)">
+                            <div class="timeline-dot absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 bg-white border-slate-300 group-hover:border-amber-400 transition-colors"></div>
+                            <h5 class="font-semibold text-slate-600 group-hover:text-amber-600 transition-colors">3. The State Vetting</h5>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Months 5-12+</span>
+                        </div>
+
+                         <!-- Step 4 -->
+                         <div class="relative cursor-pointer group" onclick="updateTimeline(3)">
+                            <div class="timeline-dot absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 bg-white border-slate-300 group-hover:border-amber-400 transition-colors"></div>
+                            <h5 class="font-semibold text-slate-600 group-hover:text-amber-600 transition-colors">4. Pre-Opening Audit</h5>
+                            <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Month 13+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Details Panel -->
+                <div class="lg:col-span-2 bg-white rounded-xl card-shadow p-8 border border-stone-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 id="tl-title" class="text-xl font-bold text-amber-700">Preparation & Formation</h4>
+                            <span id="tl-duration" class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">Duration: 1-3 Months</span>
+                        </div>
+                        <p id="tl-desc" class="text-slate-600 mb-6 leading-relaxed">
+                            Before you even speak to the regulator, you must build the shell. This involves incorporating (C-Corp), raising capital, and most critically, finding your Qualified Manager.
+                        </p>
+                        
+                        <div class="bg-stone-50 p-4 rounded-lg border border-stone-200 mb-6">
+                            <h5 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wide">Key Checklist Items</h5>
+                            <ul id="tl-list" class="space-y-2 text-sm text-slate-600">
+                                <li class="flex items-start"><span class="mr-2">Checking...</span> Incorporate C-Corp (Specific "Escrow" naming rules apply)</li>
+                                <li class="flex items-start"><span class="mr-2">Checking...</span> Deposit Liquid Capital ($25k - $50k)</li>
+                                <li class="flex items-start"><span class="mr-2">Checking...</span> Recruit Qualified Manager (Must have 5 yrs exp)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Wait Time Viz -->
+                    <div class="border-t border-stone-100 pt-6">
+                        <h5 class="text-sm font-bold text-slate-500 mb-2">Stage Activity Level</h5>
+                        <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden flex">
+                            <div id="tl-bar-active" class="bg-amber-500 h-full" style="width: 80%"></div>
+                            <div id="tl-bar-waiting" class="bg-slate-300 h-full" style="width: 20%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>Active Work</span>
+                            <span>Waiting on Regulator</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: FINANCIALS & BONDS -->
+        <section id="financials" class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900">Understanding "The Bond"</h3>
+                    <p class="text-slate-600 mt-2">
+                        One of the biggest confusions is <strong>Surety Bond</strong> vs. <strong>Liquid Assets</strong>. 
+                        A bond is an insurance policy for your customers, not a cash deposit you make. 
+                        Liquid assets are actual cash you must have in the bank.
+                    </p>
+                </div>
+
+                <!-- Calculator -->
+                <div class="bg-white p-6 rounded-xl card-shadow border border-stone-100">
+                    <h4 class="font-bold text-lg mb-4 text-slate-800 border-b pb-2">Cost Estimator</h4>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Required Bond Amount</label>
+                            <select id="bondInput" class="w-full p-2 border border-slate-300 rounded-md bg-stone-50 text-slate-800 focus:ring-2 focus:ring-amber-500 outline-none" onchange="calculateBond()">
+                                <option value="25000">Minimum: $25,000</option>
+                                <option value="50000" selected>Typical: $50,000</option>
+                                <option value="100000">High Volume: $100,000</option>
+                            </select>
+                            <p class="text-xs text-slate-400 mt-1">Based on liability/activity volume.</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Your Credit Score (Owner)</label>
+                            <select id="creditInput" class="w-full p-2 border border-slate-300 rounded-md bg-stone-50 text-slate-800 focus:ring-2 focus:ring-amber-500 outline-none" onchange="calculateBond()">
+                                <option value="0.01">Excellent (750+)</option>
+                                <option value="0.03">Average (650-749)</option>
+                                <option value="0.05">Poor (Below 650)</option>
+                            </select>
+                        </div>
+
+                        <div class="bg-amber-50 p-4 rounded-lg mt-4 border border-amber-100">
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-sm text-amber-800 font-medium">Estimated Annual Premium:</span>
+                                <span id="premiumOutput" class="text-2xl font-bold text-amber-900">$1,500</span>
+                            </div>
+                            <p class="text-xs text-amber-700 leading-snug">
+                                This is what you pay out of pocket per year to an insurance company. You do <strong>not</strong> need to pay the full $<span id="faceValueDisplay">50,000</span> unless you default.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liquid Assets Explanation -->
+            <div class="bg-slate-900 text-white p-8 rounded-xl card-shadow flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-10 text-9xl">💰</div>
+                <h4 class="text-xl font-bold mb-4 relative z-10">The "Hard Cash" Requirement</h4>
+                <p class="text-slate-300 mb-6 relative z-10 leading-relaxed">
+                    Unlike the bond (which is a fee), <strong>Liquid Asset Requirements</strong> must be met with real money in your operating account.
+                </p>
+                
+                <div class="space-y-4 relative z-10">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                        <span>Min. Liquid Assets (DFPI)</span>
+                        <span class="font-mono text-amber-400 font-bold">$25,000</span>
+                    </div>
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                        <span>Recommended Runway</span>
+                        <span class="font-mono text-amber-400 font-bold">$75,000+</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span>Tangible Net Worth</span>
+                        <span class="font-mono text-amber-400 font-bold">$50,000+</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-slate-800 p-4 rounded text-xs text-slate-400">
+                    <strong>Note:</strong> You typically must submit audited financial statements proving this liquidity with your application.
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: STANDARDS OF PRACTICE -->
+        <section id="reality" class="bg-white rounded-xl card-shadow border border-stone-100 p-8">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Standards of Practice: Law vs. Reality</h3>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-stone-50 rounded-lg p-5 border border-stone-200">
+                    <div class="flex items-center mb-3">
+                        <span class="text-xl mr-2">👔</span>
+                        <h4 class="font-bold text-slate-800">The "Manager" Trap</h4>
+                    </div>
+                    <div class="text-sm space-y-3">
+                        <p><strong class="text-amber-700">Regulation:</strong> You must have a qualified manager with 5 years experience to apply.</p>
+                        <p><strong class="text-slate-700">Reality:</strong> This is a "Catch-22". You have to hire (and pay) this person for the 6-12 months while you wait for the license, with zero revenue coming in. Most founders offer equity or "signing bonuses" to keep them on board during the wait.</p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-stone-50 rounded-lg p-5 border border-stone-200">
+                    <div class="flex items-center mb-3">
+                        <span class="text-xl mr-2">🔎</span>
+                        <h4 class="font-bold text-slate-800">Background Checks</h4>
+                    </div>
+                    <div class="text-sm space-y-3">
+                        <p><strong class="text-amber-700">Regulation:</strong> Officers, directors, and shareholders (10%+) must be fingerprinted (Live Scan).</p>
+                        <p><strong class="text-slate-700">Reality:</strong> The DFPI digs deep. An old DUI or minor financial blemish from 10 years ago can delay your application by 3 months. Disclose <em>everything</em> upfront. Surprises = Rejections.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-stone-50 rounded-lg p-5 border border-stone-200">
+                    <div class="flex items-center mb-3">
+                        <span class="text-xl mr-2">🛡️</span>
+                        <h4 class="font-bold text-slate-800">EAFC Membership</h4>
+                    </div>
+                    <div class="text-sm space-y-3">
+                        <p><strong class="text-amber-700">Regulation:</strong> Membership in Escrow Agents' Fidelity Corporation is mandatory.</p>
+                        <p><strong class="text-slate-700">Reality:</strong> This is the final boss. Even if DFPI approves you, EAFC can deny coverage if they don't like your financials or manager. Without EAFC, you cannot open.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-slate-400 text-sm pb-8">
+            <p>Generated for educational purposes. Always consult a California attorney for specific legal advice.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA & STATE ---
+        const timelineData = [
+            {
+                title: "Preparation & Formation",
+                duration: "1-3 Months",
+                desc: "Before you even speak to the regulator, you must build the shell. This involves incorporating (C-Corp), raising capital, and most critically, finding your Qualified Manager.",
+                checklist: [
+                    "Incorporate C-Corp (Specific 'Escrow' naming rules apply)",
+                    "Deposit Liquid Capital ($25k - $50k)",
+                    "Recruit Qualified Manager (Must have 5 yrs exp)"
+                ],
+                activePct: 80,
+                waitingPct: 20
+            },
+            {
+                title: "The Application",
+                duration: "Month 4",
+                desc: "Submission of the 'Form 10' or equivalent. This is a massive documentation dump including personal histories, financial statements, and lease agreements.",
+                checklist: [
+                    "Submit Statement of Identity for all owners",
+                    "Submit Audited Financials",
+                    "Fingerprinting (Live Scan) via DOJ"
+                ],
+                activePct: 90,
+                waitingPct: 10
+            },
+            {
+                title: "The State Vetting",
+                duration: "Months 5-12+",
+                desc: "The 'Black Hole'. The state reviews background checks and financials. They will send 'Deficiency Letters' asking for clarification. Response speed is key.",
+                checklist: [
+                    "Respond to Deficiency Letter #1",
+                    "Manager Interview by State",
+                    "Background Check Clearance"
+                ],
+                activePct: 10,
+                waitingPct: 90
+            },
+            {
+                title: "Pre-Opening Audit",
+                duration: "Month 13+",
+                desc: "Approval is conditional. You must now prove you are ready to open doors. A state auditor will physically inspect your office.",
+                checklist: [
+                    "Secure Surety Bond",
+                    "Join EAFC (Fidelity Corp)",
+                    "Pass Office Inspection"
+                ],
+                activePct: 60,
+                waitingPct: 40
+            }
+        ];
+
+        const regulatoryData = {
+            escrow: {
+                authority: "Regulator: DFPI",
+                desc: "Department of Financial Protection & Innovation",
+                definition: "A neutral third party that holds funds and documents. Licensed under the CA Financial Code Div 6. Cannot issue title insurance policies. Commonly known as 'Independent Escrow'.",
+                restrictions: [
+                    "Must be a standalone C-Corporation.",
+                    "Sole purpose: Escrow business only.",
+                    "Must have a qualified manager (5+ years exp).",
+                    "Strict audit requirements (CPA)."
+                ],
+                chartData: [20, 80], // 20 complex, 80 simple (relative)
+                chartLabel: "Barrier to Entry: Medium/High"
+            },
+            title: {
+                authority: "Regulator: CDI",
+                desc: "California Department of Insurance",
+                definition: "Issues title insurance policies AND handles escrow. Regulated under the Insurance Code. Requires significantly higher capitalization and underwriting contracts.",
+                restrictions: [
+                    "Capital requirements: $500k minimum net worth.",
+                    "Must have Title Plant (records) or access to one.",
+                    "Must obtain Underwriting Agreement.",
+                    "Strict rate filing requirements."
+                ],
+                chartData: [85, 15],
+                chartLabel: "Barrier to Entry: Very High"
+            }
+        };
+
+        // --- CHART INSTANCES ---
+        let marketChartInstance = null;
+
+        // --- FUNCTIONS ---
+
+        function initCharts() {
+            const ctx = document.getElementById('marketShareChart').getContext('2d');
+            marketChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Complexity/Cost', 'Ease of Entry'],
+                    datasets: [{
+                        data: [60, 40],
+                        backgroundColor: ['#b45309', '#e5e7eb'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function switchRegulatoryView(type) {
+            // Update Buttons
+            const btnEscrow = document.getElementById('btn-escrow');
+            const btnTitle = document.getElementById('btn-title');
+            
+            if(type === 'escrow') {
+                btnEscrow.className = "px-6 py-2 rounded-md text-sm font-medium transition-all shadow-sm bg-white text-slate-900";
+                btnTitle.className = "px-6 py-2 rounded-md text-sm font-medium transition-all text-slate-500 hover:text-slate-900";
+            } else {
+                btnTitle.className = "px-6 py-2 rounded-md text-sm font-medium transition-all shadow-sm bg-white text-slate-900";
+                btnEscrow.className = "px-6 py-2 rounded-md text-sm font-medium transition-all text-slate-500 hover:text-slate-900";
+            }
+
+            // Update Text
+            const data = regulatoryData[type];
+            document.getElementById('reg-authority').innerText = data.authority;
+            document.getElementById('reg-desc').innerText = data.desc;
+            document.getElementById('reg-definition').innerText = data.definition;
+            
+            const ul = document.getElementById('reg-restrictions');
+            ul.innerHTML = '';
+            data.restrictions.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                ul.appendChild(li);
+            });
+
+            // Update Chart
+            marketChartInstance.data.datasets[0].data = data.chartData;
+            marketChartInstance.update();
+        }
+
+        function updateTimeline(index) {
+            const data = timelineData[index];
+            
+            // Update Text
+            document.getElementById('tl-title').innerText = data.title;
+            document.getElementById('tl-duration').innerText = `Duration: ${data.duration}`;
+            document.getElementById('tl-desc').innerText = data.desc;
+            
+            // Update List
+            const list = document.getElementById('tl-list');
+            list.innerHTML = '';
+            data.checklist.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "flex items-start";
+                li.innerHTML = `<span class="mr-2 text-amber-500">✓</span> ${item}`;
+                list.appendChild(li);
+            });
+
+            // Update Bars
+            document.getElementById('tl-bar-active').style.width = `${data.activePct}%`;
+            document.getElementById('tl-bar-waiting').style.width = `${data.waitingPct}%`;
+
+            // Update Nav Styles
+            const dots = document.querySelectorAll('.timeline-dot');
+            dots.forEach((dot, i) => {
+                const parent = dot.parentElement;
+                if (i === index) {
+                    parent.classList.add('step-active');
+                    dot.classList.remove('bg-white', 'border-slate-300');
+                    dot.classList.add('bg-amber-600', 'border-amber-100');
+                } else {
+                    parent.classList.remove('step-active');
+                    dot.classList.add('bg-white', 'border-slate-300');
+                    dot.classList.remove('bg-amber-600', 'border-amber-100');
+                }
+            });
+        }
+
+        function calculateBond() {
+            const amount = parseInt(document.getElementById('bondInput').value);
+            const rate = parseFloat(document.getElementById('creditInput').value);
+            
+            const premium = amount * rate;
+            
+            // Format currency
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            });
+
+            document.getElementById('premiumOutput').innerText = formatter.format(premium);
+            document.getElementById('faceValueDisplay').innerText = new Intl.NumberFormat('en-US').format(amount);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initCharts();
+            updateTimeline(0); // Set initial timeline state
+            calculateBond();   // Set initial calc state
+        });
+
+    </script>
+</body>
+</html>
