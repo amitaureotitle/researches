@@ -18,89 +18,93 @@
             color: var(--text-color);
             margin: 0;
             padding: 0;
-            line-height: 1.6;
         }
 
         header {
             background: white;
-            padding: 1.5rem 2rem;
+            padding: 1rem 2rem;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            justify-content: space-between;
         }
 
-        .logo {
-            height: 40px; /* Adjust based on your logo shape */
-            font-weight: bold;
-            font-size: 1.2rem;
+        .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        /* FIXED LOGO SIZE HERE */
+        .logo-container img {
+            height: 40px;      /* Force the height to 40 pixels */
+            width: auto;       /* Keep the aspect ratio */
+            display: block;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-color);
         }
 
         main {
-            max-width: 900px;
+            max-width: 800px;
             margin: 3rem auto;
             padding: 0 1rem;
         }
 
-        h1 { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        h1 { font-size: 1.5rem; margin-bottom: 2rem; color: #334155; }
 
         #research-list {
             display: grid;
-            gap: 1rem;
+            gap: 12px;
             list-style: none;
             padding: 0;
         }
 
         .research-item {
             background: var(--card-bg);
-            padding: 1.2rem;
-            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
             border: 1px solid #e2e8f0;
-            transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             align-items: center;
+            transition: all 0.2s ease;
         }
 
         .research-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+            transform: translateX(5px);
         }
 
         .research-item a {
             text-decoration: none;
-            color: var(--text-color);
-            font-weight: 500;
-            flex-grow: 1;
-        }
-
-        .file-icon {
-            margin-right: 15px;
             color: var(--primary-color);
+            font-weight: 500;
+            font-size: 1.05rem;
         }
 
-        .loading { font-style: italic; color: #64748b; }
+        .file-icon { margin-right: 15px; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">
-        <img src="logo.png" alt="Company Logo" onerror="this.style.display='none'"> 
-        <span>Knowledge Hub</span>
+    <div class="logo-container">
+        <img src="logo.png" alt="Logo">
+        <span class="logo-text">Knowledge Hub</span>
     </div>
 </header>
 
 <main>
-    <h1>Research Directory</h1>
+    <h1>Latest Research Papers</h1>
     <ul id="research-list">
-        <li class="loading">Fetching latest researches...</li>
+        <li style="color: #64748b;">Loading latest files...</li>
     </ul>
 </main>
-
+    
 <script>
     // CONFIGURATION
     const GITHUB_USERNAME = 'amitaureotitle';
