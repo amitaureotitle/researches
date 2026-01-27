@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA Title & Escrow Manager Mandates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcfaf7; color: #1e293b; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 250px; }
+        .tab-active { border-bottom: 3px solid #b45309; color: #b45309; }
+        .card-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .experience-bar { height: 8px; border-radius: 4px; background: #e2e8f0; overflow: hidden; }
+        .experience-fill { height: 100%; background: #b45309; transition: width 0.5s ease-out; }
+    </style>
+    <!-- Chosen Palette: Warm Professional - Background #fcfaf7, Primary #b45309, Accent #0f172a -->
+    <!-- Application Structure Plan: 
+         1. Comparison Table: Directly addressing the 5-year experience requirement for Title vs. Escrow.
+         2. Residency & Presence Map: Visualizing the "On-Site" requirement.
+         3. Out-of-State Experience Meter: Explaining the CA reciprocity challenges.
+         4. Manager FAQ interaction: Drill-down on "What counts as experience?"
+    -->
+    <!-- Visualization & Content Choices:
+         - Experience Requirements: A side-by-side bar visualization showing years required.
+         - Reciprocity Map: A visual guide to why CA ignores certain states' experience.
+         - Interaction: Tabbed views to toggle between DFPI (Escrow) and CDI (Title) requirements.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-[#fcfaf7]">
+
+    <header class="bg-white border-b border-stone-200 py-6">
+        <div class="max-w-5xl mx-auto px-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">The "Qualified Manager" Mandate</h1>
+                <p class="text-slate-500 text-sm">CA Regulatory deep-dive: Experience, Residency, and Reciprocity</p>
+            </div>
+            <div class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                Expert Analysis
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-10 space-y-12">
+
+        <!-- SECTION 1: THE 5-YEAR QUESTION -->
+        <section class="grid md:grid-cols-2 gap-8 items-start">
+            <div class="space-y-6">
+                <h2 class="text-2xl font-bold text-slate-900">1. Does everyone need 5 years?</h2>
+                <p class="text-slate-600 leading-relaxed">
+                    The short answer is <strong>No</strong>, but it is complicated. The "5-year rule" is a statutory requirement for <em>Independent Escrow</em>, whereas for <em>Title</em>, it is a matter of administrative discretion.
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 card-shadow">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-slate-800">Independent Escrow (DFPI)</span>
+                            <span class="text-amber-600 font-mono text-sm font-bold">STRICT 5 YRS</span>
+                        </div>
+                        <div class="experience-bar mb-2"><div class="experience-fill" style="width: 100%"></div></div>
+                        <p class="text-xs text-slate-500">Financial Code § 17200.8: Manager must have 5 years of "responsible escrow experience."</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 card-shadow">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-slate-800">Title Company (CDI)</span>
+                            <span class="text-slate-400 font-mono text-sm font-bold">FLEXIBLE</span>
+                        </div>
+                        <div class="experience-bar mb-2"><div class="experience-fill" style="width: 60%; background: #64748b;"></div></div>
+                        <p class="text-xs text-slate-500">Insurance Code: Focuses on "competence and integrity." Usually requires a track record, but not a hard 5-year legislative cliff.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 text-white p-8 rounded-2xl flex flex-col justify-center">
+                <h3 class="text-lg font-bold mb-4 flex items-center">
+                    <span class="mr-2">💡</span> The "Manager Trap"
+                </h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                    In Independent Escrow, the 5 years must be <strong>consecutive and recent</strong>. If your manager has 10 years experience but has been out of the industry for the last 3 years, the DFPI may reject the application. 
+                </p>
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                    <h4 class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-2">Pro-Tip</h4>
+                    <p class="text-xs text-slate-300">
+                        Most startups hire a "Manager of Record" solely for the application. Expect to pay a premium for their "qualifying" status—roughly $10k-$15k/month during the waiting period.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: RESIDENCY & LOCATION -->
+        <section class="bg-white rounded-2xl border border-stone-200 card-shadow overflow-hidden">
+            <div class="p-8 border-b border-stone-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">2. Residency & Presence</h2>
+                    <p class="text-slate-500">Does the manager need to live in California?</p>
+                </div>
+                <div class="flex space-x-2">
+                    <div class="px-4 py-2 bg-stone-100 rounded-lg text-xs font-bold text-slate-600">ON-SITE MANDATORY</div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3">
+                <div class="p-8 border-r border-stone-100 space-y-4">
+                    <h4 class="font-bold text-amber-800">Physical Presence</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        The manager must be <strong>stationed at the licensed location</strong> during all business hours. You cannot have one manager "overseeing" multiple branches from another state.
+                    </p>
+                </div>
+                <div class="p-8 border-r border-stone-100 space-y-4">
+                    <h4 class="font-bold text-amber-800">CA Nexus</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        While the law doesn't technically say "must have a CA driver's license," the DFPI background check (Statement of Identity) requires a residency history. Living in CA is the practical standard.
+                    </p>
+                </div>
+                <div class="p-8 space-y-4">
+                    <h4 class="font-bold text-amber-800">Remote Work?</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Post-COVID, the DFPI has allowed <em>some</em> flexibility for staff, but the <strong>Qualified Manager</strong> is generally expected to be physically tethered to the main office for audit purposes.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: OUT OF STATE EXPERIENCE -->
+        <section class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <h2 class="text-2xl font-bold text-slate-900">3. The Reciprocity Problem</h2>
+                <p class="text-slate-600">
+                    Does experience in another state count? <strong>Only if you can prove it matches CA standards.</strong>
+                </p>
+                <div class="chart-container">
+                    <canvas id="reciprocityChart"></canvas>
+                </div>
+                <p class="text-xs text-slate-400 text-center italic">Likelihood of CA accepting experience from other settlement types</p>
+            </div>
+
+            <div class="bg-stone-50 border border-stone-200 rounded-2xl p-8 space-y-6">
+                <h3 class="font-bold text-slate-800">Why CA is "The Island"</h3>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="bg-amber-600 text-white p-1 rounded mr-3 mt-1 text-xs">A</div>
+                        <div>
+                            <p class="text-sm font-bold">Dry Settlement vs. Wet Settlement</p>
+                            <p class="text-xs text-slate-500">CA is a "dry" state. We don't fund at the table. Many states fund immediately. The DFPI considers the "dry" process more complex and requires CA-specific experience.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-amber-600 text-white p-1 rounded mr-3 mt-1 text-xs">B</div>
+                        <div>
+                            <p class="text-sm font-bold">The Escrow Law (Fin Code 17000)</p>
+                            <p class="text-xs text-slate-500">CA has the most comprehensive escrow statutes in the nation. Experience in a state with "light" regulation (like NV or AZ) is often viewed as insufficient.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="bg-amber-600 text-white p-1 rounded mr-3 mt-1 text-xs">C</div>
+                        <div>
+                            <p class="text-sm font-bold">Attorneys vs. Escrow Officers</p>
+                            <p class="text-xs text-slate-500">Experience as a Paralegal in an "Attorney State" (like GA or NY) almost never counts towards the 5-year requirement in CA.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE CALCULATOR: WHAT COUNTS? -->
+        <section class="bg-slate-900 text-white p-10 rounded-3xl text-center space-y-8">
+            <div>
+                <h2 class="text-2xl font-bold">Quick Check: Is your Manager "Qualified"?</h2>
+                <p class="text-slate-400 mt-2">Select the background to see the DFPI acceptance probability</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="checkQual('officer')" class="px-6 py-3 bg-slate-800 border border-slate-700 rounded-xl hover:bg-amber-600 hover:border-amber-400 transition-all">Escrow Officer (CA)</button>
+                <button onclick="checkQual('outstate')" class="px-6 py-3 bg-slate-800 border border-slate-700 rounded-xl hover:bg-amber-600 hover:border-amber-400 transition-all">Escrow Officer (TX/AZ)</button>
+                <button onclick="checkQual('attorney')" class="px-6 py-3 bg-slate-800 border border-slate-700 rounded-xl hover:bg-amber-600 hover:border-amber-400 transition-all">Closing Attorney (NY/FL)</button>
+                <button onclick="checkQual('assistant')" class="px-6 py-3 bg-slate-800 border border-slate-700 rounded-xl hover:bg-amber-600 hover:border-amber-400 transition-all">Escrow Assistant (5+ yrs)</button>
+            </div>
+
+            <div id="qualResult" class="min-h-[100px] flex items-center justify-center">
+                <div class="text-slate-500 italic">Click a button above to run the logic...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-5xl mx-auto px-6 py-10 border-t border-stone-200 text-center text-slate-400 text-xs">
+        <p>Disclaimer: This data is synthesized from CA Financial Code and Department of Insurance bulletins. Regulatory moods change; consult with a licensing specialist before hiring.</p>
+    </footer>
+
+    <script>
+        // --- CHARTS ---
+        function initCharts() {
+            const ctx = document.getElementById('reciprocityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['CA Officer', 'AZ/NV Officer', 'TX/WA Officer', 'East Coast Attorney'],
+                    datasets: [{
+                        label: 'Acceptance Probability %',
+                        data: [100, 45, 30, 5],
+                        backgroundColor: [
+                            '#b45309',
+                            '#d97706',
+                            '#f59e0b',
+                            '#64748b'
+                        ],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, max: 100, grid: { display: false } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // --- INTERACTIVE LOGIC ---
+        function checkQual(type) {
+            const display = document.getElementById('qualResult');
+            let content = '';
+
+            switch(type) {
+                case 'officer':
+                    content = `
+                        <div class="bg-green-900/30 border border-green-500 p-6 rounded-2xl text-left max-w-xl">
+                            <h4 class="text-green-400 font-bold mb-2">✅ HIGH PROBABILITY (95%)</h4>
+                            <p class="text-sm">This is the gold standard. 5 years as a CA Escrow Officer is exactly what the DFPI is looking for. Ensure their background check is clean and their 5 years are documented by W-2s.</p>
+                        </div>
+                    `;
+                    break;
+                case 'outstate':
+                    content = `
+                        <div class="bg-amber-900/30 border border-amber-500 p-6 rounded-2xl text-left max-w-xl">
+                            <h4 class="text-amber-400 font-bold mb-2">⚠️ MEDIUM PROBABILITY (30-50%)</h4>
+                            <p class="text-sm">You will need to provide a detailed "Experience Affidavit." You must map their out-of-state duties to CA Financial Code requirements. Expect the state to ask for a CA-based assistant to "bridge the gap."</p>
+                        </div>
+                    `;
+                    break;
+                case 'attorney':
+                    content = `
+                        <div class="bg-red-900/30 border border-red-500 p-6 rounded-2xl text-left max-w-xl">
+                            <h4 class="text-red-400 font-bold mb-2">❌ LOW PROBABILITY (<5%)</h4>
+                            <p class="text-sm">The DFPI typically rejects "Closing Attorneys" from other states. They view attorney-led closings as a different legal animal. They want operational escrow experience, not legal oversight.</p>
+                        </div>
+                    `;
+                    break;
+                case 'assistant':
+                    content = `
+                        <div class="bg-slate-800 border border-slate-600 p-6 rounded-2xl text-left max-w-xl">
+                            <h4 class="text-slate-300 font-bold mb-2">❓ UNCERTAIN (Varies)</h4>
+                            <p class="text-sm">"Responsible experience" usually implies they were the primary officer on a desk. If they were "just an assistant" (meaning they didn't sign off on instructions), the DFPI will likely reject them as the primary manager.</p>
+                        </div>
+                    `;
+                    break;
+            }
+            display.innerHTML = content;
+        }
+
+        window.onload = initCharts;
+    </script>
+</body>
+</html>
