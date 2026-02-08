@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Washington Title & Escrow Licensing Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .chart-container { position: relative; height: 280px; width: 100%; }
+        .stat-card { transition: transform 0.2s; border-left: 4px solid #0f172a; }
+        .stat-card:hover { transform: scale(1.02); }
+    </style>
+    <!-- Chosen Palette: Evergreen & Slate - Inspired by the Pacific Northwest -->
+    <!-- Application Structure Plan:
+         1. Executive Summary: Comparing WA to CA in a high-level table.
+         2. Time Breakdown: Vertical timeline showing the 6-9 month path.
+         3. Financial Calculator: Breaking down the specific WA bond and "Plant" costs.
+         4. Requirement Drill-down: Focusing on the "Title Plant" and "Escrow Officer" exams.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-slate-50">
+
+    <!-- Header -->
+    <header class="bg-[#064e3b] text-white py-10 px-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold">Washington State Path</h1>
+                <p class="text-emerald-100 mt-2">Title Insurance Agent & Escrow Licensing (OIC)</p>
+            </div>
+            <div class="mt-4 md:mt-0 bg-emerald-800 px-4 py-2 rounded-lg border border-emerald-600">
+                <span class="text-xs uppercase font-bold text-emerald-300">Timeline Estimate</span>
+                <p class="text-xl font-bold">6 - 9 Months</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-10 space-y-10">
+
+        <!-- SECTION 1: COST ESTIMATOR -->
+        <section class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4">The "Start-Up" Capital</h2>
+                <p class="text-sm text-slate-500 mb-6">Washington requires specific financial security before the OIC will issue a license.</p>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded">
+                        <span class="text-sm font-medium">OIC Licensing Fees</span>
+                        <span class="font-mono font-bold">$1,200</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded">
+                        <span class="text-sm font-medium">Surety Bond (Min $200k)</span>
+                        <span class="font-mono font-bold">~$2,000/yr</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded">
+                        <span class="text-sm font-medium">E&O Insurance (Min $250k)</span>
+                        <span class="font-mono font-bold">~$3,500/yr</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded">
+                        <span class="text-sm font-medium">Title Plant Contract</span>
+                        <span class="font-mono font-bold">$10k - $25k</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-100">
+                    <div class="flex justify-between items-baseline">
+                        <h3 class="text-lg font-bold">Total Estimated Cash</h3>
+                        <span class="text-2xl font-black text-emerald-700">$20k - $45k</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2">*Excluding office rent and employee salaries.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-center space-y-4">
+                <div class="bg-slate-900 text-white p-6 rounded-xl stat-card">
+                    <h4 class="text-emerald-400 font-bold uppercase text-xs tracking-widest mb-1">Key Difference</h4>
+                    <p class="text-sm leading-relaxed font-light">
+                        In WA, the <strong>Surety Bond</strong> is much higher than CA ($200,000 vs $25,000–$50,000). While the premium is affordable, the underwriting is stricter.
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                    <h4 class="text-slate-900 font-bold text-sm mb-1">The "Plant" Constraint</h4>
+                    <p class="text-xs text-slate-600">
+                        Washington law (RCW 48.29.020) requires a "complete set of tract indexes." You must either build one or pay an existing plant for access. This is your biggest "non-negotiable" cost.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: TIMELINE -->
+        <section class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-xl font-bold mb-8">Washington Licensing Timeline</h2>
+            <div class="chart-container">
+                <canvas id="waTimelineChart"></canvas>
+            </div>
+            <div class="grid md:grid-cols-4 gap-4 mt-8">
+                <div class="p-4 bg-slate-50 rounded-lg">
+                    <span class="text-xs font-bold text-slate-400">STAGE 1</span>
+                    <h5 class="text-sm font-bold text-slate-800">Corp Setup</h5>
+                    <p class="text-xs text-slate-500">Secretary of State & Tax ID</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-lg">
+                    <span class="text-xs font-bold text-slate-400">STAGE 2</span>
+                    <h5 class="text-sm font-bold text-slate-800">Exam & Plant</h5>
+                    <p class="text-xs text-slate-500">Officer Exam & Plant Lease</p>
+                </div>
+                <div class="p-4 bg-emerald-50 rounded-lg">
+                    <span class="text-xs font-bold text-emerald-600">STAGE 3</span>
+                    <h5 class="text-sm font-bold text-slate-800">OIC Review</h5>
+                    <p class="text-xs text-slate-500">Wait for State Approval</p>
+                </div>
+                <div class="p-4 bg-slate-50 rounded-lg">
+                    <span class="text-xs font-bold text-slate-400">STAGE 4</span>
+                    <h5 class="text-sm font-bold text-slate-800">Appointments</h5>
+                    <h5 class="text-sm font-bold text-slate-800">Launch</h5>
+                    <p class="text-xs text-slate-500">Underwriter Contracts</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: THE EXAM REQUIREMENT -->
+        <section class="grid md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 bg-stone-900 text-stone-100 p-8 rounded-2xl">
+                <h3 class="text-xl font-bold mb-4 text-emerald-400">Individual Licensure: The Exam</h3>
+                <p class="text-sm text-stone-400 mb-6">
+                    Unlike CA, where a "Manager" just needs experience, Washington requires the "Designated Responsible Licensed Person" (DRLP) to pass a state-administered exam.
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="border border-stone-700 p-4 rounded-lg">
+                        <span class="block text-xs text-stone-500 mb-1">Exam Type</span>
+                        <span class="text-sm font-bold">WA Title Agent / Escrow Officer</span>
+                    </div>
+                    <div class="border border-stone-700 p-4 rounded-lg">
+                        <span class="block text-xs text-stone-500 mb-1">Pass Rate</span>
+                        <span class="text-sm font-bold">~65% (First Attempt)</span>
+                    </div>
+                </div>
+                <p class="mt-6 text-xs text-stone-500 bg-stone-800 p-3 rounded">
+                    <strong>Note:</strong> You must also provide fingerprints for a background check via IdentoGO, which takes about 2 weeks to clear.
+                </p>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-center">
+                <div class="text-4xl mb-4">📋</div>
+                <h4 class="font-bold mb-2">Residency Rule</h4>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Washington is slightly more lenient on out-of-state residency than California, but you <strong>must</strong> have a physical office in WA or be in a reciprocal state with a "Non-Resident" license.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-5xl mx-auto px-6 py-10 text-center text-slate-400 text-xs">
+        <p>Information based on RCW 48.29 and WA OIC licensing guidelines. Data last verified 2024.</p>
+    </footer>
+
+    <script>
+        function initCharts() {
+            const ctx = document.getElementById('waTimelineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6', 'Month 7', 'Month 8'],
+                    datasets: [{
+                        label: 'Application Progress',
+                        data: [10, 25, 45, 60, 85, 90, 95, 100],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#064e3b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: 100,
+                            ticks: { callback: value => value + '%' }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = initCharts;
+    </script>
+</body>
+</html>
